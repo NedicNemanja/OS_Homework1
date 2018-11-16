@@ -5,8 +5,11 @@
 #include <stdlib.h>
 
 typedef enum ERRORCODE { OK=0,
-                  SHMGET=1,  //shmget() failed
-                  SHMAT,
+  BAD_ARGUMENTS=1,
+  SHMGET=2,  //shmget() failed
+  SHMAT,
+  SEMGET,
+  SEM_DEL=5,
 } ERRORCODE;
 
 //this informs about the error that terminated the prog abruptly

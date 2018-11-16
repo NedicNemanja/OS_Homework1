@@ -6,11 +6,11 @@ CC = gcc
 CFLAGS=-g -I$(INCLUDE_DIR)
 OUT = prodline
 
-_DEPS = CheckStage.h ErrorCodes.h ManufactureStage.h PaintshopStage.h
+_DEPS = CheckStage.h ErrorCodes.h ManufactureStage.h PaintshopStage.h SharedMem.h
 #pattern matching from  _DEPS to include directory
 DEPS = $(patsubst %,$(INCLUDE_DIR)/%,$(_DEPS))
 
-_OBJ = CheckStage.o main.o ManufactureStage.o PaintshopStage.o
+_OBJ = CheckStage.o main.o ManufactureStage.o PaintshopStage.o SharedMem.o
 #same pattern matching principe
 OBJ = $(patsubst %,$(OBJECT_DIR)/%,$(_OBJ))
 
