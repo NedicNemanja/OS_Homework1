@@ -14,7 +14,7 @@
 int ManufactureStage(key_t queueid,int ptype,int num_parts){
   printf("ManufactureStage%d Process started\n", ptype);
 
-  char* SHMqueue = QueueAttach(queueid);
+  char* mem = QueueAttach(queueid);
 
   /*init rand num generator*/
   time_t t;
@@ -27,12 +27,12 @@ int ManufactureStage(key_t queueid,int ptype,int num_parts){
     gettimeofday(&t,NULL);
     Component comp = {GenerateComponentID(ptype), t, ptype};
     //insert in queue
-    //MoveToSharedMem(SHMqueue,comp,sizeof(Component));
+    QueueInsert(mem,&comp);
     //sleep [0,MAX_MANUFACTURE_TIME)
     sleep(SleepTime(rand()));
   }
 
   /*Cleanup*/
-  QueueDetach(SHMqueue);
+  QueueDetach(mem);
   return 0;
 }

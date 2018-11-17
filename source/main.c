@@ -42,7 +42,7 @@ int main(int argc,char* argv[]){
   /*Create ManufactureStage processes*/
   for(int type=1; type<=3; type++){
     if(fork() == 0){
-      return ManufactureStage(memkey,type,num_parts);
+      return ManufactureStage(queueid1,type,num_parts);
     }
   }
   /*Create Paintshop process*/
