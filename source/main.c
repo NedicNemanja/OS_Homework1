@@ -22,10 +22,10 @@ int main(int argc,char* argv[]){
   int num_parts = GetArgs(argc,argv);
   const key_t memkey=0x1111, semkey=0x2222;
 
-  /*Get part queues in shared memory*/
-  int queueid1 = QueueInit(memkey,num_parts,1); //queue for type1 parts
-  int queueid2 = QueueInit(memkey,num_parts,2); //..type2...
-  int queueid3 = QueueInit(memkey,num_parts,3); //...type3...
+  /*Get part queues in shared memory (shmget)*/
+  int queueid1 = QueueInit(memkey,num_parts); //queue for type1 parts
+  int queueid2 = QueueInit(memkey,num_parts); //..type2...
+  int queueid3 = QueueInit(memkey,num_parts); //...type3...
 
   /*Setup semaphores
   sem%4=0 down when there are no parts available

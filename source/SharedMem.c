@@ -1,5 +1,6 @@
 #include "ErrorCodes.h"
 #include "SharedMem.h"
+#include "Component.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,22 +10,14 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-size_t SizeOfPartType(int ptype){
-  switch(ptype){
-    case 1: return sizeof(struct Part1);
-    case 2: return sizeof(struct Part2);
-    case 3: return sizeof(struct Part3);
-  }
-}
-
-size_t MEMSIZE(int num_parts,int ptype){
-  return (size_t)(num_parts*SizeOfPartType(ptype);
+size_t MEMSIZE(int num_parts){
+  return (size_t)(num_parts*sizeof(Component));
 }
 
 /*Get shared memory segment*/
-int QueueInit(key_t shkey,int num_parts,int ptype){
+int QueueInit(key_t shkey,int num_parts){
   int shmid;
-  if((shmid=shmget(shkey,MEMSIZE(num_parts,ptype),IPC_CREAT | 0600)) < 0){
+  if((shmid=shmget(shkey,MEMSIZE(num_parts),IPC_CREAT | 0600)) < 0){
     perror("shmget: ");
     exit(SHMGET);
   }
