@@ -20,13 +20,13 @@ int GetArgs(int argc,char* argv[]);
 
 int main(int argc,char* argv[]){
   int num_parts = GetArgs(argc,argv);
-  const key_t memkey=0x1111;
-  key_t semkeys[3] = {0x2222,0x3333,0x4444};
+  key_t memkeys[3] = {1111,1112,0x1113};
+  key_t semkeys[3] = {2221,2222,0x2223};
 
-  /*Get part queues in shared memory (shmget)*/
-  int queueids[3] = { QueueInit(memkey,num_parts),
-                      QueueInit(memkey,num_parts),
-                      QueueInit(memkey,num_parts)};
+  /*Get SHMemQueues in shared memory(shmget) and init their semaphores(semget)*/
+  int queueids[3] = { QueueInit(memkeys[0],num_parts,semkeys[0]),
+                      QueueInit(memkeys[1],num_parts,semkeys[1]),
+                      QueueInit(memkeys[2],num_parts,semkeys[2])};
 
   /*Create ManufactureStage processes*/
   for(int i=0; i<3; i++){
@@ -45,19 +45,8 @@ int main(int argc,char* argv[]){
     }
   }
 
-  /*Setup semaphores for each queue (3x4)
-  sem0 down when there are no parts available
-  sem1 down when there are no parts to be painted
-  sem2 down when there are no parts to be checked
-  sem3 down when there are no parts to be assembled
-  */
-  int semids[3];
-  for(int i=0; i<3; i++){
-    if((semids[i]=semget(semkeys[i],4,IPC_CREAT | 0600)) < 0){
-      perror("semget: ");
-      exit(SEMGET);
-    }
-  }
+  /*Run assemblage process*/
+
 
   //wait for all children before you terminate
   int status;
@@ -66,13 +55,8 @@ int main(int argc,char* argv[]){
 
   /*Cleanup*/
   for(int i=0; i<3; i++){
-    //semaphores
-    if(semctl(semids[i], 0, IPC_RMID) < 0){
-      perror("Could not delete semaphores.\n");
-      exit(SEM_DEL);
-    }
-    //shared memory
-    QueueDelete(queueids[i]);
+    //delete shared memory and its semaphores
+    QueueDelete(queueids[i],semkeys[i]);
   }
   return 0;
 }

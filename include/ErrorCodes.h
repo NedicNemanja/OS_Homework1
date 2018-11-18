@@ -9,7 +9,9 @@ typedef enum ERRORCODE { OK=0,
   SHMGET=2,  //shmget() failed
   SHMAT,
   SEMGET,
-  SEM_DEL=5,
+  SEM_DEL,
+  SEMCTL,
+  SEMOP,
 } ERRORCODE;
 
 //this informs about the error that terminated the prog abruptly
