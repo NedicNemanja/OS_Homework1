@@ -20,29 +20,18 @@ int GetArgs(int argc,char* argv[]);
 
 int main(int argc,char* argv[]){
   int num_parts = GetArgs(argc,argv);
-  const key_t memkey=0x1111, semkey=0x2222;
+  const key_t memkey=0x1111;
+  key_t semkeys[3] = {0x2222,0x3333,0x4444};
 
   /*Get part queues in shared memory (shmget)*/
-  int queueid1 = QueueInit(memkey,num_parts); //queue for type1 parts
-  int queueid2 = QueueInit(memkey,num_parts); //..type2...
-  int queueid3 = QueueInit(memkey,num_parts); //...type3...
-
-  /*Setup semaphores
-  sem%4=0 down when there are no parts available
-  sem%4=1 down when there are no parts to be painted
-  sem%4=2 down when there are no parts to be checked
-  sem%4=3 down when there are no parts to be assembled
-  */
-  int semid;
-  if((semid=semget(semkey,12,IPC_CREAT | 0600)) < 0){
-    perror("semget: ");
-    exit(SEMGET);
-  }
+  int queueids[3] = { QueueInit(memkey,num_parts),
+                      QueueInit(memkey,num_parts),
+                      QueueInit(memkey,num_parts)};
 
   /*Create ManufactureStage processes*/
-  for(int type=1; type<=3; type++){
+  for(int i=0; i<3; i++){
     if(fork() == 0){
-      return ManufactureStage(queueid1,type,num_parts);
+      return ManufactureStage(queueids[i],i+1,num_parts,semkeys[i]);
     }
   }
   /*Create Paintshop process*/
@@ -56,22 +45,35 @@ int main(int argc,char* argv[]){
     }
   }
 
+  /*Setup semaphores for each queue (3x4)
+  sem0 down when there are no parts available
+  sem1 down when there are no parts to be painted
+  sem2 down when there are no parts to be checked
+  sem3 down when there are no parts to be assembled
+  */
+  int semids[3];
+  for(int i=0; i<3; i++){
+    if((semids[i]=semget(semkeys[i],4,IPC_CREAT | 0600)) < 0){
+      perror("semget: ");
+      exit(SEMGET);
+    }
+  }
+
   //wait for all children before you terminate
-  printf("waiting...\n");
   int status;
   while (wait(&status) > 0);
   printf("Parent done\n");
 
   /*Cleanup*/
-  //semaphores
-  if(semctl(semid, 0, IPC_RMID) < 0){
-    perror("Could not delete semaphores.\n");
-    exit(SEM_DEL);
+  for(int i=0; i<3; i++){
+    //semaphores
+    if(semctl(semids[i], 0, IPC_RMID) < 0){
+      perror("Could not delete semaphores.\n");
+      exit(SEM_DEL);
+    }
+    //shared memory
+    QueueDelete(queueids[i]);
   }
-  //shared memory
-  QueueDelete(queueid1);
-  QueueDelete(queueid2);
-  QueueDelete(queueid3);
   return 0;
 }
 

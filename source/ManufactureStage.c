@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int ManufactureStage(key_t queueid,int ptype,int num_parts){
+int ManufactureStage(int queueid,int ptype,int num_parts,key_t semkey){
   printf("ManufactureStage%d Process started\n", ptype);
 
   char* mem = QueueAttach(queueid);
