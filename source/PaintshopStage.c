@@ -25,7 +25,7 @@ int PaintshopStage(int* queueids, int num_parts){
   for(int i=0; i<3*num_parts; i++){
     //pick which Component Type (1,2,3) to paint
     int type = PickComponentType(queues);
-    //printf("(%d) painting type%d\n", i,type);
+    printf("(%d) painting type%d\n", i,type);
     QueuePaint(queues[type-1],type);
   }
 
@@ -44,10 +44,11 @@ if all paint_sem are down.*/
 int PickComponentType(SHMemQueue** queues){
   int min = semctl(queues[0]->semid,check_sem,GETVAL);
   int type = 1;
+  printf("type%d val=%d sem=%d\n", 1, min, semctl(queues[0]->semid,paint_sem,GETVAL));
   for(int i=1; i<=2; i++){
     int val = semctl(queues[i]->semid,check_sem,GETVAL);
-    //printf("type%d val=%d sem=%d\n", i, val, semctl(queues[i]->semid,paint_sem,GETVAL));
-    if((val < min) && (semctl(queues[i]->semid,paint_sem,GETVAL) > 0)){
+    printf("type%d val=%d sem=%d\n", i+1, val, semctl(queues[i]->semid,paint_sem,GETVAL));
+    if((val <= min) && (semctl(queues[i]->semid,paint_sem,GETVAL) > 0)){
       min = val;
       type = i+1;
     }

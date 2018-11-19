@@ -12,17 +12,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int ManufactureStage(int queueid,int ptype,int num_parts,key_t semkey){
+int ManufactureStage(int queueid,int ptype,int num_parts){
   printf("ManufactureStage%d Process started\n", ptype);
   //get queue from shared memory
   char* mem = QueueAttach(queueid);
   SHMemQueue* queue = (SHMemQueue*)mem;
-  //get queue semaphore
-  int semid;
-  if((semid=semget(semkey,1,IPC_CREAT | 0600)) < 0){
-    perror("semget: ");
-    exit(SEMGET);
-  }
   //init rand num generator for random sleep time
   time_t t;
   srand((unsigned) time(&t));

@@ -95,7 +95,7 @@ void QueueInsert(SHMemQueue* queue, Component* comp){
 
 /*Paint the next component of the queue*/
 void QueuePaint(SHMemQueue* queue,int type){
-  //decrease semaphore
+  //decrease paint semaphore
   struct sembuf sops;
   sops.sem_num = paint_sem; //paint_sem controls num of parts to be painted
   sops.sem_op = -1;
@@ -105,18 +105,43 @@ void QueuePaint(SHMemQueue* queue,int type){
     exit(SEMOP);
   }
   //paint component based on type
-  sleep(paint_time[type]);
-  //move next
+  sleep(paint_time[type-1]);
+  //compnent ready for checking, increase check semaphore
+  sops.sem_num = check_sem; //check_sem controls num of parts to be checked
   (queue->next)++;
+  sops.sem_op = 1;
+  sops.sem_flg = 0;
+  if(semop(queue->semid,&sops,1) != 0){
+    perror("paint_sem op +1 failed.");
+    exit(SEMOP);
+  }
+}
+
+/*Check the next painted component of the queue*/
+void QueueCheck(SHMemQueue* queue,int type){
+  //decrease check semaphore
+  struct sembuf sops;
+  sops.sem_num = check_sem; //check_sem controls num of parts to be checked
+  sops.sem_op = -1;
+  sops.sem_flg = 0;
+  if(semop(queue->semid,&sops,1) != 0){
+    perror("check_sem op -1 failed.");
+    exit(SEMOP);
+  }
+  //check component
+  sleep(check_time[type-1]);
+  //comp checked, ready for assemblage, increase checked semaphore
+  (queue->checked)++;
+  sops.sem_num = assemble_sem; //check_sem controls num of parts to be checked
+  sops.sem_op = 1;
+  sops.sem_flg = 0;
+  if(semop(queue->semid,&sops,1) != 0){
+    perror("assemble_sem op +1 failed.");
+    exit(SEMOP);
+  }
 }
 
 /*return pointer to back element*/
 char* GetBackOffset(SHMemQueue* queue){
   return queue->elements+(queue->back*sizeof(Component));
-}
-
-/*get sem_val of semaphore sem_num from the queue's semaphore set
-typedef enum SEMNUM { paint_sem=0,check_sem=1,assemble_sem=2 };*/
-int GetSemVal(SHMemQueue* queue, int sem_num){
-
 }

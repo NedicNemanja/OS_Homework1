@@ -11,6 +11,11 @@ union semun {
   struct seminfo  *__buf;  /* Buffer for IPC_INFO (Linux-specific) */
 };
 
+/*HERE MAYBE SET THESE INTS TO ATOMIC VOLAITAILE*/
+
+
+
+
 typedef struct SHMemQueue{
   int back; //newest queue element
   int next; //next elem to be retrieved for painting
@@ -28,7 +33,8 @@ typedef struct SHMemQueue{
 typedef enum SEMNUM { paint_sem=0,check_sem=1,assemble_sem=2 }SEMNUM;
 SEMNUM SEM_NUMBER;
 
-/*Get size of queue*/
+/***********Initialization and Destruction*************************************/
+/*Get size of queue memory for queue elements (in bytes)*/
 size_t MEMSIZE(int num_parts);
 
 /*Get shared memory segment*/
@@ -38,15 +44,16 @@ char* QueueAttach(int shmid);
 void QueueDetach(char* shm);
 void QueueDelete(int shmid,key_t semkey);
 
-
+/************QUEUE OPS*********************************************************/
 /*Insert Component in shared memory*/
 void QueueInsert(SHMemQueue* queue,Component* comp);
 /*Paint the next component of the queue*/
 void QueuePaint(SHMemQueue* queue,int type);
+/*Check the next painted component of the queue*/
+void QueueCheck(SHMemQueue* queue,int type);
 
-/*******GETTERS*******************************/
+/************GETTERS***********************************************************/
 /*return pointer to back element*/
 char* GetBackOffset(SHMemQueue* queue);
-/*get sem_val of semaphore sem_num from the queue's semaphore set*/
-int GetSemVal(SHMemQueue* queue,int sem_num);
+
 #endif

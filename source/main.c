@@ -31,7 +31,7 @@ int main(int argc,char* argv[]){
   /*Create ManufactureStage processes*/
   for(int i=0; i<3; i++){
     if(fork() == 0){
-      return ManufactureStage(queueids[i],i+1,num_parts,semkeys[i]);
+      return ManufactureStage(queueids[i],i+1,num_parts);
     }
   }
   /*Create Paintshop process*/
@@ -41,7 +41,7 @@ int main(int argc,char* argv[]){
   /*Create CheckStage processes*/
   for(int i=0; i<3; i++){
     if(fork() == 0){
-      return CheckStage(atoi(argv[1]));
+      return CheckStage(queueids[i],i+1,num_parts);
     }
   }
 
