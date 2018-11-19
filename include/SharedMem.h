@@ -2,6 +2,7 @@
 #define SHAREDMEM_H
 
 #include "Component.h"
+#include <sys/types.h>
 
 union semun {
   int              val;    /* Value for SETVAL */
@@ -9,7 +10,6 @@ union semun {
   unsigned short  *array;  /* Array for GETALL, SETALL */
   struct seminfo  *__buf;  /* Buffer for IPC_INFO (Linux-specific) */
 };
-
 
 typedef struct SHMemQueue{
   int back; //newest queue element
@@ -25,6 +25,8 @@ typedef struct SHMemQueue{
   */
 } SHMemQueue;
 
+typedef enum SEMNUM { paint_sem=0,check_sem=1,assemble_sem=2 }SEMNUM;
+SEMNUM SEM_NUMBER;
 
 /*Get size of queue*/
 size_t MEMSIZE(int num_parts);
@@ -38,11 +40,13 @@ void QueueDelete(int shmid,key_t semkey);
 
 
 /*Insert Component in shared memory*/
-void QueueInsert(char* mem,Component* comp);
+void QueueInsert(SHMemQueue* queue,Component* comp);
+/*Paint the next component of the queue*/
+void QueuePaint(SHMemQueue* queue,int type);
 
 /*******GETTERS*******************************/
 /*return pointer to back element*/
-char* GetBackOffset(char* mem);
-/*return semaphore id of queue at mem*/
-int GetSemId(char* mem);
+char* GetBackOffset(SHMemQueue* queue);
+/*get sem_val of semaphore sem_num from the queue's semaphore set*/
+int GetSemVal(SHMemQueue* queue,int sem_num);
 #endif

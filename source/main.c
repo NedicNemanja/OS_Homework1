@@ -36,7 +36,7 @@ int main(int argc,char* argv[]){
   }
   /*Create Paintshop process*/
   if(fork() == 0){
-    return PaintshopStage(atoi(argv[1]));
+    return PaintshopStage(queueids,num_parts);
   }
   /*Create CheckStage processes*/
   for(int i=0; i<3; i++){

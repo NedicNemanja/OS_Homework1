@@ -16,6 +16,7 @@ int ManufactureStage(int queueid,int ptype,int num_parts,key_t semkey){
   printf("ManufactureStage%d Process started\n", ptype);
   //get queue from shared memory
   char* mem = QueueAttach(queueid);
+  SHMemQueue* queue = (SHMemQueue*)mem;
   //get queue semaphore
   int semid;
   if((semid=semget(semkey,1,IPC_CREAT | 0600)) < 0){
@@ -29,13 +30,12 @@ int ManufactureStage(int queueid,int ptype,int num_parts,key_t semkey){
   /*for every part: create-sleep*/
   for(int i=0; i<num_parts; i++){
     //create component
-    struct timeval t;
-    gettimeofday(&t,NULL);
-    Component comp = {GenerateComponentID(ptype), t, ptype};
-    //insert in queue
-    QueueInsert(mem,&comp);
-    //sleep [0,MAX_MANUFACTURE_TIME)
     sleep(SleepTime(rand()));
+    struct timeval creation_time;
+    gettimeofday(&creation_time,NULL);
+    Component comp = {GenerateComponentID(ptype), creation_time, ptype};
+    //insert in queue
+    QueueInsert(queue,&comp);
   }
 
   /*Cleanup*/

@@ -1,5 +1,8 @@
 #include "Component.h"
 
+/*time in miliseconds required for paint/check for each Component type*/
+double paint_time[3],check_time[3];
+
 static int ComponentType1_id;
 static int ComponentType2_id;
 static int ComponentType3_id;

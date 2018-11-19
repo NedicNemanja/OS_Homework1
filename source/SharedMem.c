@@ -5,11 +5,11 @@
 #include <stdlib.h>
 #include <errno.h>  //perror
 //shared mem
-#include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <string.h> //memcpy
 #include <sys/sem.h>  //semaphores
+#include <unistd.h>
 
 size_t MEMSIZE(int num_parts){
   return (size_t)(num_parts*sizeof(Component));
@@ -77,30 +77,46 @@ void QueueDelete(int shmid,key_t semkey){
 }
 
 /*Insert Component in shared memory*/
-void QueueInsert(char* mem,Component* comp){
-  char* dest = GetBackOffset(mem)+sizeof(Component);
+void QueueInsert(SHMemQueue* queue, Component* comp){
+  char* dest = GetBackOffset(queue)+sizeof(Component);
+  //move back
   memcpy(dest,comp,sizeof(Component));
+  (queue->back)++;
   //increase semaphore
   struct sembuf sops;
-  sops.sem_num = 0; //sem0 controls num of parts to be painted
+  sops.sem_num = paint_sem; //paint_sem controls num of parts to be painted
   sops.sem_op = 1;  //up it by +1
   sops.sem_flg = 0;
-  if(semop(GetSemId(mem),&sops,1) != 0){
-    perror("semaphore op +1 failed.");
+  if(semop(queue->semid,&sops,1) != 0){
+    perror("paint_sem op +1 failed.");
     exit(SEMOP);
   }
 }
 
-
-
-/*return pointer to back element*/
-char* GetBackOffset(char* mem){
-  SHMemQueue* SHMqueue = (SHMemQueue*)mem;
-  return SHMqueue->elements+(SHMqueue->back*sizeof(Component));
+/*Paint the next component of the queue*/
+void QueuePaint(SHMemQueue* queue,int type){
+  //decrease semaphore
+  struct sembuf sops;
+  sops.sem_num = paint_sem; //paint_sem controls num of parts to be painted
+  sops.sem_op = -1;
+  sops.sem_flg = 0;
+  if(semop(queue->semid,&sops,1) != 0){
+    perror("paint_sem op -1 failed.");
+    exit(SEMOP);
+  }
+  //paint component based on type
+  sleep(paint_time[type]);
+  //move next
+  (queue->next)++;
 }
 
-/*return semaphore id of queue at mem*/
-int GetSemId(char* mem){
-  SHMemQueue* SHMqueue = (SHMemQueue*)mem;
-  return SHMqueue->semid;
+/*return pointer to back element*/
+char* GetBackOffset(SHMemQueue* queue){
+  return queue->elements+(queue->back*sizeof(Component));
+}
+
+/*get sem_val of semaphore sem_num from the queue's semaphore set
+typedef enum SEMNUM { paint_sem=0,check_sem=1,assemble_sem=2 };*/
+int GetSemVal(SHMemQueue* queue, int sem_num){
+
 }
