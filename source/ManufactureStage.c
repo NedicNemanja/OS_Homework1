@@ -34,5 +34,6 @@ int ManufactureStage(int queueid,int ptype,int num_parts){
 
   /*Cleanup*/
   QueueDetach(mem);
+  printf("Closing Manufacture%d.\n", ptype);
   return 0;
 }

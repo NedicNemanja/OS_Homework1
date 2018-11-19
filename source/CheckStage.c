@@ -20,6 +20,9 @@ int CheckStage(int queueid,int ptype,int num_parts){
   for(int i=0; i<num_parts; i++){
     QueueCheck(queue,ptype);
   }
+  //Cleanup
+  QueueDetach(mem);
+  printf("Closing Check%d.\n", ptype);
   return 0;
 }
 
