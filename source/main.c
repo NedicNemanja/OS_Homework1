@@ -26,7 +26,7 @@ int main(int argc,char* argv[]){
   SetCheckTimes();
   SetAssemblageTime();
 
-  /*Get SHMemQueues in shared memory(shmget) and init their semaphores(semget)*/
+  /*Get SHMemQueues in shared memory(shmget)*/
   int queueids[3] = { QueueInit(memkeys[0],num_parts),
                       QueueInit(memkeys[1],num_parts),
                       QueueInit(memkeys[2],num_parts)};
@@ -54,7 +54,7 @@ int main(int argc,char* argv[]){
   //wait for all children before you terminate
   int status;
   while (wait(&status) > 0);
-  printf("Parent done\n");
+  printf("Children done\n");
 
   PrintSetTimes();
   /*Cleanup*/

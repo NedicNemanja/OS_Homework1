@@ -29,8 +29,9 @@ void AssemblageStage(int* queueids, int num_parts){
     SemDown(assemble_semids[2]);
     //assemble
     Product prod = QueueAssemble(queues);
-    total_wait_time += CalcProductWaitTime(prod);
-    printf("\tAssembled Product %ld\n", prod.id);
+    double d = CalcProductWaitTime(prod);
+    total_wait_time += d;
+    printf("\tAssembled Product %ld in %fsec\n", prod.id, d);
     fflush(stdin);
   }
 
@@ -39,5 +40,5 @@ void AssemblageStage(int* queueids, int num_parts){
     QueueDeleteSemaphores(queues[i]);
     QueueDetach(mems[i]);
   }
-  printf("Closing Assemblage. Average (total) Wait Time: %f\n", total_wait_time/num_parts);
+  printf("Closing Assemblage. Average (total) Wait Time: %fsec\n", total_wait_time/num_parts);
 }

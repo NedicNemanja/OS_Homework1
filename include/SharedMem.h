@@ -11,26 +11,13 @@ union semun {
   struct seminfo  *__buf;  /* Buffer for IPC_INFO (Linux-specific) */
 };
 
-/*HERE MAYBE SET THESE INTS TO ATOMIC VOLAITAILE*/
-
-
-
-
 typedef struct SHMemQueue{
-  int back; //newest queue element
-  int next; //next elem to be retrieved for painting
-  int painted;  //next elem to be retrived for checking
-  int checked;  //next elem to be retrieved for assemblage
+  volatile int back; //newest queue element
+  volatile int next; //next elem to be retrieved for painting
+  volatile int painted;  //next elem to be retrived for checking
+  volatile int checked;  //next elem to be retrieved for assemblage
   key_t paint_semkey,check_semkey,assemble_semkey;
 } SHMemQueue;
-
-/*
-paint_sem down when there are no parts to be painted
-check_sem down when there are no parts to be checked
-assemble_sem down when there are no parts to be assembled
-*/
-typedef enum SEMNUM { paint_sem=0,check_sem=1,assemble_sem=2 }SEMNUM;
-SEMNUM SEM_NUMBER;
 
 /***********Initialization and Destruction*************************************/
 /*Get size of queue memory for queue elements (in bytes)*/

@@ -12,13 +12,13 @@ void PrintSetTimes();
 #define MAX_MANUFACTURE_TIME 100 //in miliseconds
 /*time in miliseconds required for paint for each Component type*/
 double paint_time[3];
-#define MAX_PAINT_TIME 100  //in miliseconds
+#define MAX_PAINT_TIME 10  //in miliseconds
 /*time in miliseconds required for check for each Component type*/
 double check_time[3];
-#define MAX_CHECK_TIME 100 //in miliseconds
+#define MAX_CHECK_TIME 10 //in miliseconds
 /*time in miliseconds required for assemblage*/
 double assemblage_time;
-#define MAX_ASSEMBLAGE_TIME 100 //in miliseconds
+#define MAX_ASSEMBLAGE_TIME 10 //in miliseconds
 
 /***********************Component*********************************************/
 typedef struct Component{
