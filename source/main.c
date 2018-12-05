@@ -7,13 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>  //perror
-//shared memory
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-
-#include <sys/sem.h>  //semaphores
+#include <time.h>
 #include <sys/wait.h> //wait for children
 #include <unistd.h> //fork
 
@@ -22,6 +16,8 @@ int GetArgs(int argc,char* argv[]);
 int main(int argc,char* argv[]){
   int num_parts = GetArgs(argc,argv);
   key_t memkeys[3] = {0x1111,0x2222,0x3333};
+  time_t t;
+  srand((unsigned) time(&t));
   SetPaintTimes();
   SetCheckTimes();
   SetAssemblageTime();

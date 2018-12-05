@@ -54,8 +54,6 @@ void PrintComponent(Component* comp){
 
 
 void SetPaintTimes(){
-  time_t t;
-  srand((unsigned) time(&t));
   for(int i=0; i<3; i++){
     paint_time[i] = (rand()%MAX_PAINT_TIME)/1000.0;
     printf("\ttype%d paint_time:%f\n", i+1,paint_time[i]);
@@ -63,8 +61,6 @@ void SetPaintTimes(){
 }
 
 void SetCheckTimes(){
-  time_t t;
-  srand((unsigned) time(&t));
   for(int i=0; i<3; i++){
     check_time[i] = (rand()%MAX_CHECK_TIME)/1000.0;
     printf("\ttype%d check_time: %f\n", i+1,check_time[i]);
@@ -73,8 +69,6 @@ void SetCheckTimes(){
 
 
 void SetAssemblageTime(){
-  time_t t;
-  srand((unsigned) time(&t));
   assemblage_time = (rand()%MAX_ASSEMBLAGE_TIME)/1000.0;
   printf("\tassemblage_time: %f\n", assemblage_time);
 }
