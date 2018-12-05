@@ -12,6 +12,8 @@ typedef enum ERRORCODE { OK=0,
   SEM_DEL,
   SEMCTL,
   SEMOP,
+  FTOK, //tried ftok for semkey and failed
+  PICK_TYPE,  //in painshop PickComponentType couldn't pick a type
 } ERRORCODE;
 
 //this informs about the error that terminated the prog abruptly

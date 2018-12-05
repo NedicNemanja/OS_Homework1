@@ -19,17 +19,16 @@ union semun {
 typedef struct SHMemQueue{
   int back; //newest queue element
   int next; //next elem to be retrieved for painting
-  int checked;  //next elem to be retrived for checking
-  int painted;  //next elem to be retrieved for assemblage
-  char* elements; //ptr to where queue elements start (first element)
-  int semid;  //semaphore set id
-  /*
-  sem0 down when there are no parts to be painted
-  sem1 down when there are no parts to be checked
-  sem2 down when there are no parts to be assembled
-  */
+  int painted;  //next elem to be retrived for checking
+  int checked;  //next elem to be retrieved for assemblage
+  key_t paint_semkey,check_semkey,assemble_semkey;
 } SHMemQueue;
 
+/*
+paint_sem down when there are no parts to be painted
+check_sem down when there are no parts to be checked
+assemble_sem down when there are no parts to be assembled
+*/
 typedef enum SEMNUM { paint_sem=0,check_sem=1,assemble_sem=2 }SEMNUM;
 SEMNUM SEM_NUMBER;
 
@@ -37,23 +36,29 @@ SEMNUM SEM_NUMBER;
 /*Get size of queue memory for queue elements (in bytes)*/
 size_t MEMSIZE(int num_parts);
 
-/*Get shared memory segment*/
-int QueueInit(key_t shkey,int num_parts,key_t semkey);
+/*Get shared memory segment and semaphore keys with ftok*/
+int QueueInit(key_t shkey,int num_parts);
 /*Attach shared memory segment*/
 char* QueueAttach(int shmid);
+void QueueDeleteSemaphores(SHMemQueue* queue);
 void QueueDetach(char* shm);
-void QueueDelete(int shmid,key_t semkey);
+void QueueDelete(int shmid);
 
 /************QUEUE OPS*********************************************************/
 /*Insert Component in shared memory*/
 void QueueInsert(SHMemQueue* queue,Component* comp);
 /*Paint the next component of the queue*/
-void QueuePaint(SHMemQueue* queue,int type);
+Component* QueuePaint(SHMemQueue* queue,int type);
 /*Check the next painted component of the queue*/
 void QueueCheck(SHMemQueue* queue,int type);
-
+Product QueueAssemble(SHMemQueue** queues);
 /************GETTERS***********************************************************/
-/*return pointer to back element*/
-char* GetBackOffset(SHMemQueue* queue);
+/*return pointer to element at offset*/
+char* GetOffset(SHMemQueue* queue, int offset);
 
+/**********SEMAPHORE OPS******************************************************/
+int SemGet(key_t semkey);
+void SemDown(int semid);
+void SemUp(int semid);
+void SemDelete(int semid);
 #endif
