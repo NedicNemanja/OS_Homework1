@@ -6,7 +6,7 @@
 int PaintshopStage(int* queueids, int num_parts);
 
 /*Find the component type with the min number of components available for the
-checking stage (avoid checking being idle).
+checking stage (to avoid checking processes being idle).
 But ignore queues whose paint_semaphores are down, you don't have any components
 to pull from them anyway.
 Return values 1,2,3 for component type 1,2 and 3. Default is 1,

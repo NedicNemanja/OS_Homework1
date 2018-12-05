@@ -46,9 +46,9 @@ int PaintshopStage(int* queueids, int num_parts){
 /*Find the component type with the min number of components available for the
 checking stage (avoid checking being idle).
 But ignore queues whose paint_semaphores are down, you don't have any components
-to pull from them anyway.
-Return values 1,2,3 for component type 1,2 and 3. Default is 1,
-if all paint_sem are down.*/
+to pull from them anyway. If all semaphores are down then pick aa type whose
+parts have not been painted yet.
+Return values 1,2,3 for component type 1,2 and 3.*/
 int PickComponentType(SHMemQueue** queues, int* check_semids,int* paint_semids,
   int num_parts){
   int min,type=-1;
